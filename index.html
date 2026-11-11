@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Cantinho</title>
+<meta name="theme-color" content="#2F7F79">
+<meta name="description" content="Gastos, calma, dívidas e diário privado. Tudo offline, sem conta e sem anúncios.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+
+<style>
+:root{--bg:#E9F0F1;--surface:#F7FAFA;--ink:#17333C;--muted:#52707A;--line:#C9D8DB;--accent:#2F7F79;--accent-ink:#fff;--warm:#E3A53B;--bad:#B4532A;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0F1F25;--surface:#172B32;--ink:#E4EEF0;--muted:#9AB5BC;--line:#2A424A;--accent:#5DB5AC;--accent-ink:#0F1F25;--warm:#EDB95A;--bad:#E88A5E}}
+:root[data-theme="dark"]{--bg:#0F1F25;--surface:#172B32;--ink:#E4EEF0;--muted:#9AB5BC;--line:#2A424A;--accent:#5DB5AC;--accent-ink:#0F1F25;--warm:#EDB95A;--bad:#E88A5E}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 17px/1.5 Figtree,system-ui,sans-serif}
+main{max-width:560px;margin:0 auto;padding:26px 20px 120px}
+h1{font:500 32px/1.1 Literata,Georgia,serif;margin:0 0 4px}
+h2{font:500 24px/1.2 Literata,Georgia,serif;margin:0 0 6px}
+.sub{color:var(--muted);margin:0 0 20px}
+section{display:none}section.on{display:block}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:20px;margin-bottom:16px}
+label{display:block;font-weight:600;margin-bottom:6px}
+input[type=text],input[type=number],input[type=password],textarea{width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+textarea{min-height:110px;resize:vertical}
+input:focus-visible,textarea:focus-visible,button:focus-visible{outline:3px solid var(--warm);outline-offset:2px}
+button{font:600 16px Figtree,system-ui,sans-serif;border:0;border-radius:12px;padding:12px 18px;cursor:pointer;background:var(--accent);color:var(--accent-ink)}
+button.ghost{background:transparent;color:var(--accent);border:1px solid var(--line)}
+.row{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}.row input{flex:1;min-width:0}
+ul{list-style:none;margin:12px 0 0;padding:0}
+li{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--line)}
+li>span{flex:1}li small{display:block;color:var(--muted)}
+li button{padding:6px 10px;font-size:14px}
+.big{font:500 38px/1.15 Literata,Georgia,serif;margin:4px 0}
+.bad{color:var(--bad)}
+.note{color:var(--muted);font-size:14px;margin:10px 0 0}
+.breath{display:grid;place-items:center;height:230px}
+#orb{width:120px;height:120px;border-radius:50%;background:var(--accent);opacity:.85;display:grid;place-items:center;color:var(--accent-ink);font-weight:600;transition:transform 4s ease-in-out}
+.sense{font:500 26px/1.3 Literata,Georgia,serif;margin:0 0 8px}
+.entry{white-space:pre-wrap;margin:4px 0 0}
+nav{position:fixed;left:0;right:0;bottom:0;display:flex;justify-content:center;background:var(--surface);border-top:1px solid var(--line);padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px))}
+nav button{flex:1;max-width:120px;background:transparent;color:var(--muted);padding:10px 4px;font-size:15px}
+nav button[aria-current=true]{color:var(--accent);background:var(--bg)}
+.foot{color:var(--muted);font-size:14px;text-align:center;margin-top:20px}
+.hide{display:none}
+@media (prefers-reduced-motion:reduce){#orb{transition:none}}
+</style>
+</head>
+<body>
+<main>
+<h1>Cantinho</h1>
+<p class="sub">Seu dinheiro, sua calma e seus segredos. Só neste aparelho.</p>
+
+<!-- HOJE -->
+<section id="hoje" class="on">
+  <h2>Quanto posso gastar hoje?</h2>
+  <div class="card">
+    <p class="note" style="margin:0">Você pode gastar hoje</p>
+    <p class="big" id="allow">R$ 0,00</p>
+    <p class="note" id="allowN" style="margin:0"></p>
+  </div>
+  <div class="card">
+    <label for="inc">Renda do mês (R$)</label>
+    <input type="number" id="inc" inputmode="decimal" min="0" placeholder="0,00">
+    <label for="fix" style="margin-top:12px">Gastos fixos do mês: aluguel, contas, parcelas (R$)</label>
+    <input type="number" id="fix" inputmode="decimal" min="0" placeholder="0,00">
+  </div>
+  <div class="card">
+    <label for="sn">Registrar um gasto</label>
+    <div class="row" style="margin-top:0"><input type="text" id="sn" placeholder="O que foi? (opcional)" maxlength="40"><input type="number" id="sv" inputmode="decimal" min="0" placeholder="R$" style="max-width:110px"></div>
+    <div class="row"><button id="sadd">Registrar</button></div>
+    <ul id="sl"></ul>
+  </div>
+</section>
+
+<!-- CALMA -->
+<section id="calma">
+  <h2>Calma</h2>
+  <p class="sub">Para quando o aperto vier. Vamos devagar, um passo de cada vez.</p>
+  <div id="cbox"></div>
+  <p class="note">Este recurso é um apoio no momento e não substitui um profissional de saúde. Se você sentir que está em risco, ligue para o CVV no <strong>188</strong> (24h, gratuito) ou para o SAMU no <strong>192</strong>.</p>
+</section>
+
+<!-- DÍVIDAS -->
+<section id="div">
+  <h2>Plano de dívidas</h2>
+  <p class="sub">Pagar da menor para a maior costuma dar fôlego e motivação.</p>
+  <div class="card">
+    <label for="dn">Nova dívida</label>
+    <div class="row" style="margin-top:0"><input type="text" id="dn" placeholder="Ex.: cartão" maxlength="40"><input type="number" id="dv" inputmode="decimal" min="0" placeholder="Valor R$" style="max-width:120px"></div>
+    <div class="row"><button id="dadd">Adicionar dívida</button></div>
+  </div>
+  <div class="card hide" id="dplan">
+    <p class="note" style="margin:0">Total que você deve</p>
+    <p class="big" id="dtot"></p>
+    <label for="pay" style="margin-top:10px">Quanto consigo pagar por mês, no total (R$)</label>
+    <input type="number" id="pay" inputmode="decimal" min="0" placeholder="0,00">
+    <p class="note" id="dmon"></p>
+    <ul id="dl"></ul>
+  </div>
+</section>
+
+<!-- DIÁRIO -->
+<section id="dia">
+  <h2>Diário</h2>
+  <p class="sub">Um lugar onde só você escreve e lê.</p>
+  <div id="dbox"></div>
+</section>
+
+<p class="foot">Sem conta, sem anúncios, sem internet. Seus dados não saem deste aparelho.</p>
+</main>
+
+<nav id="nav">
+  <button data-t="hoje" aria-current="true">Hoje</button>
+  <button data-t="calma">Calma</button>
+  <button data-t="div">Dívidas</button>
+  <button data-t="dia">Diário</button>
+</nav>
+
+<script>
+const $=s=>document.querySelector(s);
+const money=n=>n.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+let S={inc:'',fix:'',sp:[],debts:[],pay:'',pin:'',diary:[]};
+function save(){try{localStorage.setItem('cantinho',JSON.stringify(S))}catch(e){}}
+try{const r=localStorage.getItem('cantinho');if(r)S=Object.assign(S,JSON.parse(r))}catch(e){}
+const el=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e};
+
+/* abas */
+$('#nav').onclick=e=>{const t=e.target.dataset.t;if(!t)return;
+  document.querySelectorAll('section').forEach(s=>s.classList.toggle('on',s.id===t));
+  document.querySelectorAll('nav button').forEach(b=>b.setAttribute('aria-current',b.dataset.t===t));
+  if(t!=='calma')stopB();
+  window.scrollTo(0,0)};
+
+/* HOJE */
+function rh(){
+  const now=new Date(),inc=parseFloat(S.inc)||0,fix=parseFloat(S.fix)||0;
+  const mk=now.getFullYear()+'-'+now.getMonth();
+  const mine=S.sp.filter(x=>{const d=new Date(x.t);return d.getFullYear()+'-'+d.getMonth()===mk});
+  const spent=mine.reduce((a,x)=>a+x.v,0);
+  const left=inc-fix-spent;
+  const days=new Date(now.getFullYear(),now.getMonth()+1,0).getDate()-now.getDate()+1;
+  const a=left/days;
+  const al=$('#allow');al.textContent=money(Math.max(0,a));al.className='big'+(left<0?' bad':'');
+  $('#allowN').textContent=inc<=0?'Informe sua renda abaixo para começar.':left<0?'O mês já passou do que você tem. Evite gastos extras e olhe a aba Dívidas.':'Sobram '+money(left)+' no mês, para '+days+(days===1?' dia.':' dias.');
+  const l=$('#sl');l.innerHTML='';
+  mine.slice().reverse().slice(0,6).forEach(x=>{const li=el('li');const s=el('span',null,(x.n||'Gasto')+' — '+money(x.v));
+    const b=el('button','ghost','Remover');b.onclick=()=>{S.sp=S.sp.filter(y=>y!==x&&y.t!==x.t);save();rh()};li.append(s,b);l.append(li)});
+}
+$('#inc').value=S.inc;$('#fix').value=S.fix;
+$('#inc').oninput=e=>{S.inc=e.target.value;save();rh()};
+$('#fix').oninput=e=>{S.fix=e.target.value;save();rh()};
+$('#sadd').onclick=()=>{const v=parseFloat($('#sv').value);if(!(v>0))return;S.sp.push({n:$('#sn').value.trim(),v,t:Date.now()});$('#sn').value='';$('#sv').value='';save();rh()};
+rh();
+
+/* CALMA */
+let br=null,cs=-1;
+const ph=[['Inspire',4,1.5],['Segure',4,1.5],['Solte',6,1]];
+function stopB(){clearTimeout(br);br=null}
+function loop(i){const o=$('#orb');if(!o){br=null;return}const [t,s,sc]=ph[i%3];
+  o.style.transitionDuration=s+'s';o.style.transform='scale('+(i%3===2?1:sc)+')';o.textContent=t;
+  br=setTimeout(()=>loop(i+1),s*1000)}
+const senses=[['Cinco coisas que você vê','Olhe ao redor e nomeie cinco coisas, devagar.'],['Quatro coisas que você toca','Sinta o tecido da roupa, a cadeira, o chão sob os pés.'],['Três sons que você ouve','Perceba os sons perto e os mais distantes.'],['Dois cheiros que você sente','Se não houver cheiro, lembre de um que você goste.'],['Um gosto na boca','Perceba o gosto que está aí agora, ou tome um gole de água.']];
+function rc(){
+  const b=$('#cbox');b.innerHTML='';stopB();const c=el('div','card');
+  if(cs<0){
+    c.append(el('p','sense','Está difícil agora?'),el('p','note','Vamos fazer dois passos curtos: respirar e depois voltar ao presente pelos sentidos.'));
+    const g=el('button',null,'Estou ansioso(a)');g.onclick=()=>{cs=0;rc()};{const r=el('div','row');r.append(g);c.append(r)}
+  }else if(cs===0){
+    c.append(el('p','sense','Respire comigo'));
+    const w=el('div','breath');const o=el('div');o.id='orb';o.textContent='Pronto?';w.append(o);c.append(w);
+    const n=el('button',null,'Já estou melhor, seguir');n.onclick=()=>{cs=1;rc()};{const r=el('div','row');r.append(n);c.append(r)}
+    b.append(c);loop(0);return;
+  }else if(cs<=5){
+    const [t,d]=senses[cs-1];c.append(el('p','sense',t),el('p',null,d));
+    const r=el('div','row');const n=el('button',null,cs<5?'Próximo':'Concluir');n.onclick=()=>{cs++;rc()};r.append(n);c.append(r);
+  }else{
+    c.append(el('p','sense','Você chegou até aqui.'),el('p',null,'O aperto passa, mesmo quando parece que não. Se voltar, você sabe o caminho. Beba água e, se puder, fale com alguém de confiança.'));
+    const n=el('button','ghost','Recomeçar');n.onclick=()=>{cs=-1;rc()};{const r=el('div','row');r.append(n);c.append(r)}
+  }
+  b.append(c);
+}
+rc();
+
+/* DÍVIDAS */
+function rd(){
+  const ds=S.debts.slice().sort((a,b)=>a.v-b.v),tot=ds.reduce((a,x)=>a+x.v,0);
+  $('#dplan').classList.toggle('hide',!ds.length);
+  $('#dtot').textContent=money(tot);
+  const p=parseFloat(S.pay)||0;
+  $('#dmon').textContent=p>0&&tot>0?'Estimativa: cerca de '+Math.ceil(tot/p)+' meses (sem contar juros).':'Informe quanto consegue pagar por mês para ver a estimativa.';
+  const l=$('#dl');l.innerHTML='';
+  ds.forEach((x,i)=>{const li=el('li');const s=el('span',null,(i+1)+'ª: '+x.n+' — '+money(x.v));
+    if(i===0)s.append(el('small',null,'Comece por esta: é a mais rápida de quitar.'));
+    const inp=el('input');inp.type='number';inp.min='0';inp.placeholder='Paguei R$';inp.style.cssText='width:96px;padding:6px 8px;font-size:14px';inp.setAttribute('aria-label','Valor pago');
+    const ab=el('button','ghost','Abater');ab.onclick=()=>{const v=parseFloat(inp.value);if(!(v>0))return;x.v=Math.max(0,x.v-v);if(x.v===0)S.debts=S.debts.filter(y=>y!==x);save();rd()};
+    const rm=el('button','ghost','Excluir');rm.onclick=()=>{S.debts=S.debts.filter(y=>y!==x);save();rd()};
+    li.style.flexWrap='wrap';li.append(s,inp,ab,rm);l.append(li)});
+}
+$('#pay').value=S.pay;$('#pay').oninput=e=>{S.pay=e.target.value;save();rd()};
+$('#dadd').onclick=()=>{const n=$('#dn').value.trim(),v=parseFloat($('#dv').value);if(!n||!(v>0))return;S.debts.push({n,v});$('#dn').value='';$('#dv').value='';save();rd()};
+rd();
+
+/* DIÁRIO */
+let unlocked=false;
+async function hash(s){try{const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode('cantinho:'+s));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}catch(e){return 'p:'+s}}
+function rdia(){
+  const b=$('#dbox');b.innerHTML='';const c=el('div','card');
+  if(!S.pin||!unlocked){
+    const has=!!S.pin;
+    c.append(el('label',null,has?'Digite seu PIN':'Crie um PIN de 4 a 8 números'));
+    const i=el('input');i.type='password';i.inputMode='numeric';i.maxLength=8;i.autocomplete='off';c.append(i);
+    const m=el('p','note','');
+    const g=el('button',null,has?'Abrir diário':'Criar PIN');
+    g.onclick=async()=>{const v=i.value.trim();if(!/^\d{4,8}$/.test(v)){m.textContent='Use de 4 a 8 números.';return}
+      const h=await hash(v);
+      if(!has){S.pin=h;save();unlocked=true;rdia()}else if(h===S.pin){unlocked=true;rdia()}else{m.textContent='PIN incorreto.'}};
+    const r=el('div','row');r.append(g);c.append(r,m);
+    if(!has)c.append(el('p','note','Atenção: se esquecer o PIN, não há como recuperar. O PIN impede que alguém curioso leia o diário, mas não é uma criptografia forte.'));
+    b.append(c);return;
+  }
+  c.append(el('label',null,'Escreva o que quiser'));
+  const t=el('textarea');t.maxLength=3000;c.append(t);
+  const r=el('div','row');const sv=el('button',null,'Salvar entrada');
+  sv.onclick=()=>{const v=t.value.trim();if(!v)return;S.diary.push({t:Date.now(),x:v});save();rdia()};
+  const lk=el('button','ghost','Trancar');lk.onclick=()=>{unlocked=false;rdia()};
+  r.append(sv,lk);c.append(r);b.append(c);
+  S.diary.slice().reverse().forEach(x=>{const k=el('div','card');
+    k.append(el('p','note',new Date(x.t).toLocaleString('pt-BR',{dateStyle:'long',timeStyle:'short'})),el('p','entry',x.x));
+    const d=el('button','ghost','Apagar');d.onclick=()=>{S.diary=S.diary.filter(y=>y!==x);save();rdia()};
+    const rw=el('div','row');rw.append(d);k.append(rw);b.append(k)});
+}
+rdia();
+</script>
+<script>if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{})})}</script>
+</body>
+</html>
